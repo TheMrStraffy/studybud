@@ -1,0 +1,10 @@
+FROM python:3.13.3-slim-bullseye
+
+RUN apt update && apt install -y bash libpq-dev gcc
+RUN pip install --upgrade pip
+COPY requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
+WORKDIR /app
+
+CMD [ "bash" ]

@@ -1,0 +1,42 @@
+services:
+  pgsql-dev:
+    image: bitnami/postgresql:14.17.0-debian-12-r17
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    container_name: pgsql-dev
+    networks:
+      - study-buddy
+
+  django-dev:
+    build: 
+      context: ./docker-config/django
+      dockerfile: dockerfile
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    stdin_open: True # docker run -i
+    tty: True # docker run -t
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    container_name: django-dev
+    working_dir: /app/studybud
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - study-buddy
+
+volumes:
+  pgdata:
+
+networks:
+  study-buddy:
