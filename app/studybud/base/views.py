@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.db.models import Q
 from django.http import HttpRequest
-from .models import Room
+from .models import Room, Topic
 from .forms import RoomForm
 
 # Create your views here.
@@ -12,10 +12,22 @@ from .forms import RoomForm
 #     {'id' : 3, 'name' : 'lets learn C++!'},
 # ]
 
-def home(request):
-    getAllRooms = Room.objects.all()
+def home(request:HttpRequest):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    # With Q imported from django.db.models we can set more parameters to search with
+    rooms = Room.objects.filter(
+        Q(topic__name__icontains=q) |
+        Q(name__icontains=q)
+        ) 
+    
+    topics = Topic.objects.all()
+    room_count = rooms.count()
+
     context = {
-        'rooms' : getAllRooms
+        'rooms' : rooms,
+        'room_count' : room_count,
+        'topics' : topics
     }
     return render(request, 'base/home.html', context)
 
