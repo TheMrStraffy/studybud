@@ -1,0 +1,7 @@
+[
+    {"model": "base.topic", "pk": 1, "fields": {"name": "Django"}},
+    {"model": "base.topic", "pk": 2, "fields": {"name": "Javascript"}},
+    {"model": "base.topic", "pk": 3, "fields": {"name": "PHP"}},
+    {"model": "base.topic", "pk": 4, "fields": {"name": "Java"}},
+    {"model": "base.topic", "pk": 5, "fields": {"name": "C"}}
+]
