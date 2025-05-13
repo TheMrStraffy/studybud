@@ -74,29 +74,41 @@ def registerUserView(request:HttpRequest):
     return render(request, 'base/login_register.html', {'form':form})
 
 def home(request:HttpRequest):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    q = request.GET.get('q', '')
+
+    if q:
+        rooms = Room.objects.filter(
+            Q(topic__name__iexact=q)
+            )
+        
+        all_messages = Message.objects.filter(
+            Q(room__topic__name__iexact=q)
+        )
+    else:
+        rooms = Room.objects.all()
+        all_messages = Message.objects.all()
 
     # With Q imported from django.db.models we can set more parameters to search with
-    rooms = Room.objects.filter(
-        Q(topic__name__icontains=q) |
-        Q(name__icontains=q) |
-        Q(description__icontains=q)
-        ) 
+    # rooms = Room.objects.filter(
+    #     Q(topic__name=q)
+    #     ) 
     
     topics = Topic.objects.all()
     room_count = rooms.count()
 
+
     context = {
         'rooms' : rooms,
         'room_count' : room_count,
-        'topics' : topics
+        'topics' : topics,
+        'all_messages' : all_messages,
     }
     return render(request, 'base/home.html', context)
 
 def room(request:HttpRequest, pk):
     
     room : Room = Room.objects.get(id=pk)
-    room_messages = room.message_set.all().order_by('-created')
+    room_messages = room.message_set.all()
     participants = room.participants.all()
 
     if request.method == 'POST':
