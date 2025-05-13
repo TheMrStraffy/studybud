@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpRequest, HttpResponse
-from .models import Room, Topic
+from .models import Room, Topic, Message
 from .forms import RoomForm
 from django.views import View
 
@@ -93,12 +93,26 @@ def home(request:HttpRequest):
     }
     return render(request, 'base/home.html', context)
 
-def room(request, pk):
+def room(request:HttpRequest, pk):
     
-    room = Room.objects.get(id=pk)
-    
+    room : Room = Room.objects.get(id=pk)
+    room_messages = room.message_set.all().order_by('-created')
+    participants = room.participants.all()
+
+    if request.method == 'POST':
+        Message.objects.create(
+            user = request.user,
+            room = room,
+            body = request.POST.get('body')
+        )
+        room.participants.add(request.user)
+
+        return redirect('room', pk=room.id)
+
     context = {
-        'room' : room
+        'room' : room,
+        'room_messages' : room_messages,
+        'participants' : participants,
     }
     
     return render(request, 'base/room.html', context)
@@ -147,4 +161,17 @@ def deleteRoom(request:HttpRequest, pk):
     if request.method == 'POST':
         room.delete()
         return redirect('home')
-    return render(request, 'base/delete-room.html', {'obj' : room})
+    return render(request, 'base/delete.html', {'obj' : room})
+
+@login_required(login_url='login')
+def deleteMessage(request:HttpRequest, pk):
+    room_message : Message = Message.objects.get(id=pk)
+
+    if request.user != room_message.user:
+        return HttpResponse('Not allowed')
+
+    if request.method == 'POST':
+        room_message.delete()
+        return redirect('home')
+
+    return render(request, 'base/delete.html', {'obj': room_message})
