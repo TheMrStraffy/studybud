@@ -23,6 +23,19 @@ from django.views import View
 #     {'id' : 3, 'name' : 'lets learn C++!'},
 # ]
 
+def userProfile(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    all_messages = user.message_set.all()
+    topics = Topic.objects.all()
+    context = {
+        'user':user,
+        'rooms' : rooms,
+        'topics' : topics,
+        'all_messages':all_messages
+        }
+    return render(request, 'base/user-profile.html', context)
+
 def loginView(request:HttpRequest):
 
     page = 'login'
