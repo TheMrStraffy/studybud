@@ -148,11 +148,11 @@ def createRoom(request : HttpRequest):
     form = RoomForm()
 
     if request.method == 'POST':
-        # print(request.POST)
-        # print(request.POST.get('host'))
         form = RoomForm(request.POST)
         if form.is_valid():
-            form.save()
+            room : Room = form.save(commit=False)
+            room.host = request.user
+            room.save()
             return redirect('home')
 
     context = {'form' : form}

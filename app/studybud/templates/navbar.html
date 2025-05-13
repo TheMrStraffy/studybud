@@ -1,5 +1,8 @@
-<a href="/">
-    <h1>LOGO</h1>
+
+{% load static %}
+<a class="logo" href="/">
+    <!-- <h1>LOGO</h1> -->
+     <img src="{% static 'images/doge-bread.png' %}" />
 </a>
 
 <form method="GET" action="{% url 'home' %}">
