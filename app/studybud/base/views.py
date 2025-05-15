@@ -92,7 +92,7 @@ def home(request:HttpRequest):
     if q:
         rooms = Room.objects.filter(
             Q(topic__name__iexact=q)
-            )
+        )
         
         all_messages = Message.objects.filter(
             Q(room__topic__name__iexact=q)
@@ -200,3 +200,8 @@ def deleteMessage(request:HttpRequest, pk):
         return redirect('home')
 
     return render(request, 'base/delete.html', {'obj': room_message})
+
+@login_required(login_url='login')
+def updateUser(request):
+    context = {}
+    return render(request, 'base/update-user.html', context)
